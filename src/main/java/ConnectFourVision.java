@@ -29,96 +29,115 @@ import java.awt.image.DataBufferByte;
 public class ConnectFourVision {
 
 	private static final int NUM_THRESHOLDS = 2;
-	private static Mat originalBoardImage;
+	private static final Size MAGIC_SIZE = new Size(622,457);
+	
 
-	public static int getMoveForImage(BufferedImage image, boolean ui)
-			throws VisionException {
-		// Load the OpenCV Library
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-
-		// Load the connect four original image
-		originalBoardImage = bufferedImageToMat(image);
-
-		// Resize the image to a more manageable size
-		Imgproc.resize(originalBoardImage, originalBoardImage, new Size(622,457));
-
-		// Create a copy of the original image to use
-		Mat img = originalBoardImage.clone();
-
-		if (ui) {
-			showResult(img);
-		}
-
-		// Apply thresholding techniques the board image
-		// Mat boardThreshold = generateBoardThreshold(img);
-		Mat boardThreshold = performThresholdForColor(img,Color.BLUE);
-		if (ui) {
-			showResult(boardThreshold);
-		}
-
-		// Generate a mask from the thresholded board image
-		Mat projection = generateBoardProjection(boardThreshold.clone(), ui);
-		if (ui) {
-			showResult(projection);
-		}
-
-		// Find red tokens in the image
-		LinkedList<Circle> redTokens = findTokens(projection, Color.RED);
-		System.out.println("Found " + redTokens.size() + " red tokens.");
-
-		// Find yellow tokens in the image
-		LinkedList<Circle> yellowTokens = findTokens(projection, Color.YELLOW);
-		System.out.println("Found " + yellowTokens.size() + " yellow tokens.");
-
-		// Create and display debug image for how the computer sees the game board
-		if (ui) {
-			Mat debugImage = new Mat(projection.size(),projection.type(),new Scalar(128,0,0));
-			for(Circle circle : redTokens){
-				Core.circle(debugImage, circle.getCenter(), circle.getRadius(), new Scalar(0,0,255),-1);
-			}
-			for(Circle circle : yellowTokens){
-				Core.circle(debugImage, circle.getCenter(), circle.getRadius(), new Scalar(0,255,255),-1);
-			}
-			showResult(debugImage);
-		}
-
-		// Verify the number of tokens
-		int tokenDifference = redTokens.size() - yellowTokens.size();
-		if (Math.abs(tokenDifference) > 1) {
-			throw new VisionException("Invalid numbers of game pieces.");
-		}
-
-		// Calculate the supposed positions of the pieces
-		Board board = calculateTokenPositions(projection.size(), redTokens,
-				yellowTokens);
-		board.display();
-
-		// Find whose turn it is
-		char userTurn = Board.MARK_RED;
-		if (tokenDifference > 0) {
-			userTurn = Board.MARK_BLACK;
-		}
-
-		// Display whose turn it is
-		if(userTurn == Board.MARK_RED){
-			System.out.println("It is Red's turn.");
-		}else{
-			System.out.println("It is Yellow's turn.");
-		}
-
-		// Initialize the minimax structure to find a good move
-		Minimax minimax = new Minimax(board, 10);
-		int bestMove = minimax.alphaBeta(userTurn) + 1;
-
-		return bestMove;
+	public static int getMoveForImage(byte[] data, DisplayUtil ui){
+       return -1;
 	}
+
+	public static int getMoveForImage(BufferedImage awtBufferedImage, DisplayUtil ui)
+			throws VisionException {
+			// Load the connect four original image
+			Mat originalBoardImage = bufferedImageToMat(awtBufferedImage);
+	 return getMoveForImageInternal(originalBoardImage, ui);
+	}
+
+	private static int getMoveForImageInternal(Mat originalBoardImage,  DisplayUtil ui) throws VisionException {
+			// Load the OpenCV Library
+			System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+
+			// Load the connect four original image
+		//	Mat originalBoardImage = bufferedImageToMat(awtBufferedImage);
+	
+			// Resize the image to a more manageable size
+			Imgproc.resize(originalBoardImage, originalBoardImage, MAGIC_SIZE);
+	
+			// Create a copy of the original image to use
+			Mat img = originalBoardImage.clone();
+	
+			if (ui != null) {
+				showResult(img);
+			}
+	
+			// Apply thresholding techniques the board image
+			// Mat boardThreshold = generateBoardThreshold(img);
+			Mat boardThreshold = performThresholdForColor(img,Color.BLUE);
+			if (ui != null) {
+				showResult(boardThreshold);
+			}
+	
+			// Generate a mask from the thresholded board image
+			Mat projection = generateBoardProjection(boardThreshold.clone(), originalBoardImage, ui != null);
+			if (ui != null) {
+				showResult(projection);
+			}
+	
+			// Find red tokens in the image
+			LinkedList<Circle> redTokens = findTokens(projection, Color.RED);
+			System.out.println("Found " + redTokens.size() + " red tokens.");
+	
+			// Find yellow tokens in the image
+			LinkedList<Circle> yellowTokens = findTokens(projection, Color.YELLOW);
+			System.out.println("Found " + yellowTokens.size() + " yellow tokens.");
+	
+			// Create and display debug image for how the computer sees the game board
+			if (ui != null) {
+				showResult(buildDebugImage(projection, redTokens, yellowTokens));
+			}
+	
+			// Verify the number of tokens
+			int tokenDifference = redTokens.size() - yellowTokens.size();
+			if (Math.abs(tokenDifference) > 1) {
+				throw new VisionException("Invalid numbers of game pieces.");
+			}
+	
+			// Calculate the supposed positions of the pieces
+			Board board = calculateTokenPositions(projection.size(), redTokens,
+					yellowTokens);
+			board.display();
+	
+			// Find whose turn it is
+			char userTurn = Board.MARK_RED;
+			if (tokenDifference > 0) {
+				userTurn = Board.MARK_BLACK;
+			}
+	
+			// Display whose turn it is
+			if(userTurn == Board.MARK_RED){
+				System.out.println("It is Red's turn.");
+			}else{
+				System.out.println("It is Yellow's turn.");
+			}
+	
+			// Initialize the minimax structure to find a good move
+			Minimax minimax = new Minimax(board, 10);
+			int bestMove = minimax.alphaBeta(userTurn) + 1;
+	
+			return bestMove;
+	}
+
+	private static Mat buildDebugImage(Mat projection, LinkedList<Circle> redTokens, LinkedList<Circle> yellowTokens) {
+		Mat debugImage = new Mat(projection.size(),projection.type(),new Scalar(128,0,0));
+		for(Circle circle : redTokens){
+			Core.circle(debugImage, circle.getCenter(), circle.getRadius(), new Scalar(0,0,255),-1);
+		}
+		for(Circle circle : yellowTokens){
+			Core.circle(debugImage, circle.getCenter(), circle.getRadius(), new Scalar(0,255,255),-1);
+		}
+		return debugImage;
+	}
+
+	private static Mat byteArrayToMat(byte[] data,  int height, int width) {
+		Mat mat = new Mat(height, width, CvType.CV_8UC3);
+		mat.put(0, 0, data);
+		return mat;
+	};
 
 	private static Mat bufferedImageToMat(BufferedImage bufferedImage) {
 		byte[] data = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer())
 				.getData();
-		Mat mat = new Mat(bufferedImage.getHeight(), bufferedImage.getWidth(), CvType.CV_8UC3);
-		mat.put(0, 0, data);
-		return mat;
+		return byteArrayToMat(data, bufferedImage.getHeight(), bufferedImage.getWidth());
 	};
 
 	// Returns a binary image of the board based on the specified color
@@ -190,7 +209,7 @@ public class ConnectFourVision {
 		return minCircles;
 	}
 
-	private static Mat generateBoardProjection(Mat boardThreshold, boolean ui)
+	private static Mat generateBoardProjection(Mat boardThreshold, Mat originalBoardImage, boolean ui)
 			throws VisionException {
 
 		// Find the polygon enclosing the blue connect four board
