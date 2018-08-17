@@ -3,6 +3,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import javax.imageio.ImageIO;
 
@@ -16,11 +17,18 @@ public class Driver {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 	}
 
-	private static Mat bufferedImageToMat(BufferedImage bufferedImage) {
-		byte[] data = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer())
+	private static Mat bufferedImageToMat(File file) throws IOException {
+		BufferedImage awtBufferedImage = ImageIO.read(file);		
+		byte[] data = ((DataBufferByte) awtBufferedImage.getRaster().getDataBuffer())
 				.getData();
-		return byteArrayToMat(data, bufferedImage.getHeight(), bufferedImage.getWidth());
+		return byteArrayToMat(data, awtBufferedImage.getHeight(), awtBufferedImage.getWidth());
 	};
+
+
+	private static Mat imageFileToMat(File file) throws IOException{		
+			byte[] data = Files.readAllBytes(file.toPath());
+			return byteArrayToMat(data, 0, 0);				
+	}
 
 	private static Mat byteArrayToMat(byte[] data,  int height, int width) {
 		Mat mat = new Mat(height, width, CvType.CV_8UC3);
@@ -52,8 +60,9 @@ public class Driver {
 	}
 
 	private static void processImage(File file) throws IOException {
-		BufferedImage awtBufferedImage = ImageIO.read(file);		
-		Mat originalBoardImage = bufferedImageToMat(awtBufferedImage);
+	
+		Mat originalBoardImage = bufferedImageToMat(file);
+		//Mat originalBoardImage = imageFileToMat(file);
 
 		int bestMove = -1;
 		try {
