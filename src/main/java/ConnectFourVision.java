@@ -1,7 +1,4 @@
 
-
-import java.awt.Color;
-import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 
 import org.opencv.core.Core;
@@ -19,10 +16,18 @@ public class ConnectFourVision {
 
 	private static final int NUM_THRESHOLDS = 2;
 	private static final Size MAGIC_SIZE = new Size(622,457);
+
+	public enum SupportedColors{
+		RED, YELLOW, BLUE;
+	}
 	
 
 	public static int getMoveForImage(byte[] data, DisplayUtil ui){
        return -1;
+	}
+
+	public static int getMoveForImage(Mat originalBoardImage) throws VisionException {
+		return getMoveForImage(originalBoardImage, null);
 	}
 
 	public static int getMoveForImage(Mat originalBoardImage,  DisplayUtil ui) throws VisionException {
@@ -44,7 +49,7 @@ public class ConnectFourVision {
 	
 			// Apply thresholding techniques the board image
 			// Mat boardThreshold = generateBoardThreshold(img);
-			Mat boardThreshold = performThresholdForColor(img,Color.BLUE);
+			Mat boardThreshold = performThresholdForColor(img,SupportedColors.BLUE);
 			if (ui != null) {
 				ui.showResult(boardThreshold);
 			}
@@ -56,11 +61,11 @@ public class ConnectFourVision {
 			}
 	
 			// Find red tokens in the image
-			LinkedList<Circle> redTokens = findTokens(projection, Color.RED);
+			LinkedList<Circle> redTokens = findTokens(projection, SupportedColors.RED);
 			System.out.println("Found " + redTokens.size() + " red tokens.");
 	
 			// Find yellow tokens in the image
-			LinkedList<Circle> yellowTokens = findTokens(projection, Color.YELLOW);
+			LinkedList<Circle> yellowTokens = findTokens(projection, SupportedColors.YELLOW);
 			System.out.println("Found " + yellowTokens.size() + " yellow tokens.");
 	
 			// Create and display debug image for how the computer sees the game board
@@ -113,15 +118,15 @@ public class ConnectFourVision {
 
 
 	// Returns a binary image of the board based on the specified color
-	private static Mat performThresholdForColor(Mat image, Color color){
+	private static Mat performThresholdForColor(Mat image, SupportedColors color){
 		Mat imageHSV = new Mat();
 		Imgproc.cvtColor(image, imageHSV, Imgproc.COLOR_RGB2HSV);
 		Mat threshold = new Mat();
-		if(color == Color.BLUE){
+		if(color == SupportedColors.BLUE){
 			Core.inRange(imageHSV, new Scalar(0,160,60), new Scalar(15,255,255), threshold);
-		}else if(color == Color.RED){
+		}else if(color == SupportedColors.RED){
 			Core.inRange(imageHSV, new Scalar(120,160,60), new Scalar(130,255,255), threshold);
-		}else if(color == Color.YELLOW){
+		}else if(color == SupportedColors.YELLOW){
 			Core.inRange(imageHSV, new Scalar(90,160,60), new Scalar(100,255,255), threshold);
 		}
 		return threshold;
@@ -155,7 +160,7 @@ public class ConnectFourVision {
 	}
 
 	private static LinkedList<Circle> findTokens(Mat sourceImage,
-			Color tokenColor) {
+		SupportedColors tokenColor) {
 		//Mat boardDist = distanceMatrixFromColor(sourceImage, tokenColor);
 		//Mat boardThreshold = new Mat();
 		//Imgproc.threshold(boardDist, boardThreshold, 80, 255,
