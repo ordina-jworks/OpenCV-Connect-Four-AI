@@ -23,10 +23,16 @@ public class DisplayUtilAWSImpl implements DisplayUtil{
 		MatOfByte matOfByte = new MatOfByte();
 		Highgui.imencode(".jpg", resizedImage, matOfByte);
 		byte[] byteArray = matOfByte.toArray();
-		BufferedImage bufImage = null;
+		showResult(byteArray);
+		
+		
+	}
+
+	@Override
+	public void showResult(byte[] byteArray) {
 		try {
 			InputStream in = new ByteArrayInputStream(byteArray);
-			bufImage = ImageIO.read(in);
+			BufferedImage bufImage = ImageIO.read(in);
 			JFrame frame = new JFrame();
 			frame.getContentPane().add(new JLabel(new ImageIcon(bufImage)));
 			frame.pack();

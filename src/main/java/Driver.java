@@ -16,9 +16,16 @@ public class Driver {
 	static {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 	}
+		
+	private static DisplayUtil debugDisplay = null;
+	private static final boolean debug = true;
 
 
 	public static void main(String[] args) {
+
+		if(debug){
+			debugDisplay = new DisplayUtilAWSImpl();
+		}
 
 		if (args.length == 1) {
 			String fileName = args[0];
@@ -38,37 +45,56 @@ public class Driver {
 		}
 	}
 
-	private static void processDirectory(File file) {
-		throw new RuntimeException("Not yet supported");
+	private static void processDirectory(File dir) throws IOException{
+		File[] directoryListing = dir.listFiles();
+		if (directoryListing != null) {
+		  for (File child : directoryListing) {
+			 if(child.isFile()){
+				 processImage(child);
+			 }
+		  }
+		}
 	}
 
 
 	private static void processImage(File file) throws IOException {
 			
+		System.out.println("Trying to process file:  " + file.getName());
 		Mat originalBoardImage = bufferedImageToMat(file);
 		//Issues when not using bufferedImage. Odd.
 		//Mat originalBoardImage = imageFileToMat(file);
 
 		int bestMove = -1;
-		try {
-			bestMove = ConnectFourVision.getMoveForImage(originalBoardImage, new DisplayUtilAWSImpl());
+		try {	
+			bestMove = ConnectFourVision.getMoveForImage(originalBoardImage, debugDisplay);
 		} catch (VisionException e) {			
 			e.printStackTrace();
+			
+		}
+		if(bestMove > -1){
+			System.out.println("Best Move:" + bestMove);
+		}else{
 			System.err.println("Failed for file: " + file.getName());
 		}
-		System.out.println("<BEST_MOVE>" + bestMove + "</BEST_MOVE>");
-	}
 
+		
+	}
+	private static byte[] getBytes(BufferedImage img) {
+        return ((DataBufferByte) img.getRaster().getDataBuffer()).getData();
+    }
 
 	private static Mat bufferedImageToMat(File file) throws IOException {
-		BufferedImage awtBufferedImage = ImageIO.read(file);		
-		byte[] data = ((DataBufferByte) awtBufferedImage.getRaster().getDataBuffer())
-				.getData();
+		BufferedImage awtBufferedImage = ImageIO.read(file);
+
+		awtBufferedImage = ImageUtils.resizeMaxWidth(awtBufferedImage, 800);
+
+		byte[] data = getBytes(awtBufferedImage);
+
 				int height =  awtBufferedImage.getHeight();
 				int width = awtBufferedImage.getWidth();
 				System.out.println("Height: " + height + " Width: " + width);
 		return byteArrayToMat(data, height, width );
-	};
+	}
 
 
 	private static Mat imageFileToMat(File file) throws IOException{		

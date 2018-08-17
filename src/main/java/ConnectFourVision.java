@@ -35,7 +35,7 @@ public class ConnectFourVision {
 			System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
 			// Load the connect four original image
-		//	Mat originalBoardImage = bufferedImageToMat(awtBufferedImage);
+			//	Mat originalBoardImage = bufferedImageToMat(awtBufferedImage);
 	
 			// Resize the image to a more manageable size
 			Imgproc.resize(originalBoardImage, originalBoardImage, MAGIC_SIZE);
@@ -116,14 +116,16 @@ public class ConnectFourVision {
 	}
 
 
-
 	// Returns a binary image of the board based on the specified color
 	private static Mat performThresholdForColor(Mat image, SupportedColors color){
 		Mat imageHSV = new Mat();
 		Imgproc.cvtColor(image, imageHSV, Imgproc.COLOR_RGB2HSV);
 		Mat threshold = new Mat();
 		if(color == SupportedColors.BLUE){
-			Core.inRange(imageHSV, new Scalar(0,160,60), new Scalar(15,255,255), threshold);
+			//TODO fbousson make sure the blue is actually blue..
+		Core.inRange(imageHSV, new Scalar(0,160,60), new Scalar(15,255,255), threshold);		
+		//Core.inRange(imageHSV, new Scalar(110,50,50), new Scalar(130,255,255), threshold);
+	//		Core.inRange(imageHSV, new Scalar(50,155,255), new Scalar(0,0,102), threshold);
 		}else if(color == SupportedColors.RED){
 			Core.inRange(imageHSV, new Scalar(120,160,60), new Scalar(130,255,255), threshold);
 		}else if(color == SupportedColors.YELLOW){
