@@ -2,29 +2,18 @@
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.LinkedList;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
-import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
-
-import java.awt.image.DataBufferByte;
 
 public class ConnectFourVision {
 
@@ -36,14 +25,7 @@ public class ConnectFourVision {
        return -1;
 	}
 
-	public static int getMoveForImage(BufferedImage awtBufferedImage, DisplayUtil ui)
-			throws VisionException {
-			// Load the connect four original image
-			Mat originalBoardImage = bufferedImageToMat(awtBufferedImage);
-	 return getMoveForImageInternal(originalBoardImage, ui);
-	}
-
-	private static int getMoveForImageInternal(Mat originalBoardImage,  DisplayUtil ui) throws VisionException {
+	public static int getMoveForImage(Mat originalBoardImage,  DisplayUtil ui) throws VisionException {
 			// Load the OpenCV Library
 			System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
@@ -57,20 +39,20 @@ public class ConnectFourVision {
 			Mat img = originalBoardImage.clone();
 	
 			if (ui != null) {
-				showResult(img);
+				ui.showResult(img);
 			}
 	
 			// Apply thresholding techniques the board image
 			// Mat boardThreshold = generateBoardThreshold(img);
 			Mat boardThreshold = performThresholdForColor(img,Color.BLUE);
 			if (ui != null) {
-				showResult(boardThreshold);
+				ui.showResult(boardThreshold);
 			}
 	
 			// Generate a mask from the thresholded board image
-			Mat projection = generateBoardProjection(boardThreshold.clone(), originalBoardImage, ui != null);
+			Mat projection = generateBoardProjection(boardThreshold.clone(), originalBoardImage, ui);
 			if (ui != null) {
-				showResult(projection);
+				ui.showResult(projection);
 			}
 	
 			// Find red tokens in the image
@@ -83,7 +65,7 @@ public class ConnectFourVision {
 	
 			// Create and display debug image for how the computer sees the game board
 			if (ui != null) {
-				showResult(buildDebugImage(projection, redTokens, yellowTokens));
+				ui.showResult(buildDebugImage(projection, redTokens, yellowTokens));
 			}
 	
 			// Verify the number of tokens
@@ -128,17 +110,7 @@ public class ConnectFourVision {
 		return debugImage;
 	}
 
-	private static Mat byteArrayToMat(byte[] data,  int height, int width) {
-		Mat mat = new Mat(height, width, CvType.CV_8UC3);
-		mat.put(0, 0, data);
-		return mat;
-	};
 
-	private static Mat bufferedImageToMat(BufferedImage bufferedImage) {
-		byte[] data = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer())
-				.getData();
-		return byteArrayToMat(data, bufferedImage.getHeight(), bufferedImage.getWidth());
-	};
 
 	// Returns a binary image of the board based on the specified color
 	private static Mat performThresholdForColor(Mat image, Color color){
@@ -209,7 +181,7 @@ public class ConnectFourVision {
 		return minCircles;
 	}
 
-	private static Mat generateBoardProjection(Mat boardThreshold, Mat originalBoardImage, boolean ui)
+	private static Mat generateBoardProjection(Mat boardThreshold, Mat originalBoardImage, DisplayUtil ui)
 			throws VisionException {
 
 		// Find the polygon enclosing the blue connect four board
@@ -256,7 +228,7 @@ public class ConnectFourVision {
 		}
 		System.out.println("There are " + detectedLines.size()
 				+ " lines that were detected.");
-		if (ui) {
+		if (ui != null) {
 			Mat debugImage = originalBoardImage.clone();
 			Imgproc.drawContours(debugImage, contours, maxContourIndex, new Scalar(
 				0, 0, 255), 3);
@@ -264,7 +236,10 @@ public class ConnectFourVision {
 				Core.line(debugImage, line.getPt1(), line.getPt2(), new Scalar(0,
 						255, 0), 3);
 			}
-			showResult(debugImage);
+			
+			ui.showResult(debugImage);
+			
+			
 		}
 
 		// Get the corners of the polygon and apply the transform
@@ -366,25 +341,6 @@ public class ConnectFourVision {
 		return result;
 	}
 
-	// Displays in a window an image as specified by the parameter
-	private static void showResult(Mat image) {
-		Mat resizedImage = new Mat();
-		Imgproc.resize(image, resizedImage,
-				new Size(image.cols(), image.rows()));
-		MatOfByte matOfByte = new MatOfByte();
-		Highgui.imencode(".jpg", resizedImage, matOfByte);
-		byte[] byteArray = matOfByte.toArray();
-		BufferedImage bufImage = null;
-		try {
-			InputStream in = new ByteArrayInputStream(byteArray);
-			bufImage = ImageIO.read(in);
-			JFrame frame = new JFrame();
-			frame.getContentPane().add(new JLabel(new ImageIcon(bufImage)));
-			frame.pack();
-			frame.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+
 
 }

@@ -1,21 +1,32 @@
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
+import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 import javax.imageio.ImageIO;
 
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
 
 public class Driver {
 
 	static {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 	}
+
+	private static Mat bufferedImageToMat(BufferedImage bufferedImage) {
+		byte[] data = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer())
+				.getData();
+		return byteArrayToMat(data, bufferedImage.getHeight(), bufferedImage.getWidth());
+	};
+
+	private static Mat byteArrayToMat(byte[] data,  int height, int width) {
+		Mat mat = new Mat(height, width, CvType.CV_8UC3);
+		mat.put(0, 0, data);
+		return mat;
+	};
 
 	public static void main(String[] args) {
 
@@ -41,10 +52,12 @@ public class Driver {
 	}
 
 	private static void processImage(File file) throws IOException {
-		BufferedImage image = ImageIO.read(file);		
+		BufferedImage awtBufferedImage = ImageIO.read(file);		
+		Mat originalBoardImage = bufferedImageToMat(awtBufferedImage);
+
 		int bestMove = -1;
 		try {
-			bestMove = ConnectFourVision.getMoveForImage(image, new DisplayUtilAWSImpl());
+			bestMove = ConnectFourVision.getMoveForImage(originalBoardImage, new DisplayUtilAWSImpl());
 		} catch (VisionException e) {			
 			e.printStackTrace();
 			System.err.println("Failed for file: " + file.getName());
