@@ -17,6 +17,49 @@ public class Driver {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 	}
 
+
+	public static void main(String[] args) {
+
+		if (args.length == 1) {
+			String fileName = args[0];
+			System.out.println("Starting Connect Four Analysis for file: " + fileName);
+			try {
+				File file = new File(fileName);
+				if (file.isDirectory()) {
+					processDirectory(file);
+				} else {
+					processImage(file);
+				}
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			} 
+			System.out.println("Done");
+		}
+	}
+
+	private static void processDirectory(File file) {
+		throw new RuntimeException("Not yet supported");
+	}
+
+
+	private static void processImage(File file) throws IOException {
+			
+		Mat originalBoardImage = bufferedImageToMat(file);
+		//Issues when not using bufferedImage. Odd.
+		//Mat originalBoardImage = imageFileToMat(file);
+
+		int bestMove = -1;
+		try {
+			bestMove = ConnectFourVision.getMoveForImage(originalBoardImage, new DisplayUtilAWSImpl());
+		} catch (VisionException e) {			
+			e.printStackTrace();
+			System.err.println("Failed for file: " + file.getName());
+		}
+		System.out.println("<BEST_MOVE>" + bestMove + "</BEST_MOVE>");
+	}
+
+
 	private static Mat bufferedImageToMat(File file) throws IOException {
 		BufferedImage awtBufferedImage = ImageIO.read(file);		
 		byte[] data = ((DataBufferByte) awtBufferedImage.getRaster().getDataBuffer())
@@ -40,44 +83,5 @@ public class Driver {
 		return mat;
 	};
 
-	public static void main(String[] args) {
-
-		if (args.length == 1) {
-			System.out.println("Starting Connect Four Analysis");
-			try {
-				File file = new File(args[0]);
-				if (file.isDirectory()) {
-					processDirectory(file);
-				} else {
-					processImage(file);
-				}
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			} 
-			System.out.println("Done");
-		}
-	}
-
-	private static void processDirectory(File file) {
-		throw new RuntimeException("Not yet supported");
-	}
-
-	private static void processImage(File file) throws IOException {
-	
-		
-		Mat originalBoardImage = bufferedImageToMat(file);
-		//Issues when not using bufferedImage. Odd.
-		//Mat originalBoardImage = imageFileToMat(file);
-
-		int bestMove = -1;
-		try {
-			bestMove = ConnectFourVision.getMoveForImage(originalBoardImage, new DisplayUtilAWSImpl());
-		} catch (VisionException e) {			
-			e.printStackTrace();
-			System.err.println("Failed for file: " + file.getName());
-		}
-		System.out.println("<BEST_MOVE>" + bestMove + "</BEST_MOVE>");
-	}
 
 }
