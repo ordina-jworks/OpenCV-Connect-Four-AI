@@ -21,13 +21,17 @@ public class Driver {
 		BufferedImage awtBufferedImage = ImageIO.read(file);		
 		byte[] data = ((DataBufferByte) awtBufferedImage.getRaster().getDataBuffer())
 				.getData();
-		return byteArrayToMat(data, awtBufferedImage.getHeight(), awtBufferedImage.getWidth());
+				int height =  awtBufferedImage.getHeight();
+				int width = awtBufferedImage.getWidth();
+				System.out.println("Height: " + height + " Width: " + width);
+		return byteArrayToMat(data, height, width );
 	};
 
 
 	private static Mat imageFileToMat(File file) throws IOException{		
 			byte[] data = Files.readAllBytes(file.toPath());
-			return byteArrayToMat(data, 0, 0);				
+			//TODO resolve image size.
+			return byteArrayToMat(data, 881, 1200);				
 	}
 
 	private static Mat byteArrayToMat(byte[] data,  int height, int width) {
@@ -61,7 +65,9 @@ public class Driver {
 
 	private static void processImage(File file) throws IOException {
 	
+		
 		Mat originalBoardImage = bufferedImageToMat(file);
+		//Issues when not using bufferedImage. Odd.
 		//Mat originalBoardImage = imageFileToMat(file);
 
 		int bestMove = -1;
