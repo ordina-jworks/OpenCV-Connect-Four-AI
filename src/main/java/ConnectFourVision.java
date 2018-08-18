@@ -17,21 +17,25 @@ public class ConnectFourVision {
 	private static final int NUM_THRESHOLDS = 2;
 	private static final Size MAGIC_SIZE = new Size(622,457);
 
+
 	public enum SupportedColors{
 		RED, YELLOW, BLUE;
 	}
 	
 
-	public static int getMoveForImage(byte[] data, DisplayUtil ui){
-       return -1;
+	public  Board getBoard(byte[] data, DisplayUtil ui){
+       return null;
 	}
 
-	public static int getMoveForImage(Mat originalBoardImage) throws VisionException {
-		return getMoveForImage(originalBoardImage, null);
+	public  Board getBoard(Mat originalBoardImage) throws VisionException {
+		return getBoard(originalBoardImage, null);
 	}
 
-	public static int getMoveForImage(Mat originalBoardImage,  DisplayUtil ui) throws VisionException {
-			// Load the OpenCV Library
+	public  Board getBoard(Mat originalBoardImage, DisplayUtil ui) throws VisionException {
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();	
+		
+		// Load the OpenCV Library
 			System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
 			// Load the connect four original image
@@ -83,13 +87,20 @@ public class ConnectFourVision {
 			Board board = calculateTokenPositions(projection.size(), redTokens,
 					yellowTokens);
 			board.display();
-	
+
+
 			// Find whose turn it is
-			char userTurn = Board.MARK_RED;
-			if (tokenDifference > 0) {
-				userTurn = Board.MARK_BLACK;
-			}
-	
+			char userTurn = board.getUserTurn();
+
+		/**
+		 * 	// Find whose turn it is
+		 char userTurn = Board.MARK_RED;
+		 if (tokenDifference > 0) {
+		 userTurn = Board.MARK_BLACK;
+		 }
+		 */
+
+
 			// Display whose turn it is
 			if(userTurn == Board.MARK_RED){
 				System.out.println("It is Red's turn.");
@@ -98,13 +109,25 @@ public class ConnectFourVision {
 			}
 	
 			// Initialize the minimax structure to find a good move
-			Minimax minimax = new Minimax(board, 10);
-			int bestMove = minimax.alphaBeta(userTurn) + 1;
+			System.out.println("Elapsed time building board " + stopWatch.getElapsedTime());
+			//Dont do anything if the board hasnt changed. 
+			/**
+			 * Elapsed time building board 38
+			*	Total Elapsed time 257
+
+			On almost empty board:
+			Elapsed time building board 49
+			Total elapsed time 941
+			 */
+
+			stopWatch.stop();
+			System.out.println("Total elapsed time " + stopWatch.getElapsedTime());
 	
-			return bestMove;
+			return board;
+
 	}
 
-	private static Mat buildDebugImage(Mat projection, LinkedList<Circle> redTokens, LinkedList<Circle> yellowTokens) {
+	private Mat buildDebugImage(Mat projection, LinkedList<Circle> redTokens, LinkedList<Circle> yellowTokens) {
 		Mat debugImage = new Mat(projection.size(),projection.type(),new Scalar(128,0,0));
 		for(Circle circle : redTokens){
 			Core.circle(debugImage, circle.getCenter(), circle.getRadius(), new Scalar(0,0,255),-1);
@@ -117,7 +140,7 @@ public class ConnectFourVision {
 
 
 	// Returns a binary image of the board based on the specified color
-	private static Mat performThresholdForColor(Mat image, SupportedColors color){
+	private Mat performThresholdForColor(Mat image, SupportedColors color){
 		Mat imageHSV = new Mat();
 		Imgproc.cvtColor(image, imageHSV, Imgproc.COLOR_RGB2HSV);
 		Mat threshold = new Mat();
@@ -134,7 +157,7 @@ public class ConnectFourVision {
 		return threshold;
 	}
 
-	private static Board calculateTokenPositions(Size boardBounds,
+	private Board calculateTokenPositions(Size boardBounds,
 			LinkedList<Circle> redTokens, LinkedList<Circle> yellowTokens) {
 		Board result = new Board();
 		final float BLOCK_WIDTH = (float) boardBounds.width / Board.COLUMNS;
@@ -161,7 +184,7 @@ public class ConnectFourVision {
 		return result;
 	}
 
-	private static LinkedList<Circle> findTokens(Mat sourceImage,
+	private LinkedList<Circle> findTokens(Mat sourceImage,
 		SupportedColors tokenColor) {
 		//Mat boardDist = distanceMatrixFromColor(sourceImage, tokenColor);
 		//Mat boardThreshold = new Mat();
@@ -188,7 +211,7 @@ public class ConnectFourVision {
 		return minCircles;
 	}
 
-	private static Mat generateBoardProjection(Mat boardThreshold, Mat originalBoardImage, DisplayUtil ui)
+	private Mat generateBoardProjection(Mat boardThreshold, Mat originalBoardImage, DisplayUtil ui)
 			throws VisionException {
 
 		// Find the polygon enclosing the blue connect four board
@@ -214,8 +237,7 @@ public class ConnectFourVision {
 
 		// Throw an exception if the detected blue area is too small
 		if (percentSpace < 20) {
-			throw new VisionException(
-					"A sufficiently large board could not be detected.");
+			throw new VisionException("A sufficiently large board could not be detected.");
 		}
 
 		// Find possible border lines of the enclosing polygon
@@ -270,7 +292,7 @@ public class ConnectFourVision {
 
 	// Given lists of horizontal and vertical lines on the border of the image,
 	// determine the border rectangle of the image
-	private static Mat calculateBorderFromLines(LinkedList<Line> lines)
+	private Mat calculateBorderFromLines(LinkedList<Line> lines)
 			throws VisionException {
 
 		// Create a list of every intersection
@@ -337,7 +359,7 @@ public class ConnectFourVision {
 		return corners;
 	}
 
-	private static Point averagePoints(LinkedList<Point> points) {
+	private Point averagePoints(LinkedList<Point> points) {
 		Point result = new Point(0, 0);
 		for (Point point : points) {
 			result.x += point.x;
@@ -347,7 +369,5 @@ public class ConnectFourVision {
 		result.y /= points.size();
 		return result;
 	}
-
-
 
 }

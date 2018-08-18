@@ -1,3 +1,4 @@
+import java.util.Arrays;
 
 /**
  * File: Board.java
@@ -19,6 +20,10 @@ public class Board {
         board = new char[ROWS][COLUMNS];
         firstAvailableRow = new int[COLUMNS];
         reset();
+    }
+
+    public char[][] getBoardArray(){
+        return board;
     }
 
     public void reset() {
@@ -343,5 +348,88 @@ public class Board {
             }
         }
         return true;
+    }
+
+
+
+
+
+    //TODO untested
+    public boolean equals(Board otherBoard){
+        return equals(this.getBoardArray(), otherBoard.getBoardArray());
+    }
+
+
+
+    private boolean equals(final char[][] arr1, final char[][] arr2) {
+
+        if (arr1 == null) {
+      
+      
+      return (arr2 == null);
+      
+        }
+      
+      
+        if (arr2 == null) {
+      
+      
+      return false;
+      
+        }
+      
+      
+        if (arr1.length != arr2.length) {
+      
+      
+      return false;
+      
+        }
+      
+      
+        for (int i = 0; i < arr1.length; i++) {
+      
+      
+      if (!Arrays.equals(arr1[i], arr2[i])) {
+      
+      
+          return false;
+          
+      }
+      
+        }
+      
+        return true;
+          }
+
+    private int getTokenCount(char player){
+        int tokenCount = 0;
+        for (int j = 0; j<board[0].length; j++) {
+            for (int i = 0; i < board.length; i++) {
+                char charAt  = board[i][j];
+                if(player == charAt){
+                    tokenCount++;
+                }
+            }
+        }
+        return tokenCount;
+    }
+
+    private int getTokenDifference(){
+        int tokensRed = getTokenCount(MARK_RED);
+        int tokensBlack = getTokenCount(MARK_BLACK);
+
+        //System.out.println("Red token count: " + tokensRed + " Yellow token count " + tokensBlack);
+
+        return  tokensRed - tokensBlack;
+    }
+
+    public char getUserTurn() {
+        // Find whose turn it is
+        char userTurn = Board.MARK_RED;
+        if (getTokenDifference() > 0) {
+            userTurn = Board.MARK_BLACK;
+        }
+        return userTurn;
     }
 }

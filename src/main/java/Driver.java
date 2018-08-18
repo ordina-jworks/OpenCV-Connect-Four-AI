@@ -20,12 +20,17 @@ public class Driver {
 	private static DisplayUtil debugDisplay = null;
 	private static final boolean debug = true;
 
+	private static ConnectFourSolver connectFourSolver;
+
 
 	public static void main(String[] args) {
 
+		connectFourSolver = new ConnectFourSolverImpl();
 		if(debug){
 			debugDisplay = new DisplayUtilAWSImpl();
 		}
+		//CameraBridgeViewBase	
+		//https://gist.github.com/jayrambhia/5265868
 
 		if (args.length == 1) {
 			String fileName = args[0];
@@ -65,8 +70,11 @@ public class Driver {
 		//Mat originalBoardImage = imageFileToMat(file);
 
 		int bestMove = -1;
-		try {	
-			bestMove = ConnectFourVision.getMoveForImage(originalBoardImage, debugDisplay);
+		try {			
+			debugDisplay = null;
+			Board board = connectFourSolver.getBoard(originalBoardImage, debugDisplay);
+			bestMove = connectFourSolver.getBestMove(board);
+			//bestMove = ConnectFourVision.getBoard(originalBoardImage, debugDisplay);
 		} catch (VisionException e) {			
 			e.printStackTrace();
 			
