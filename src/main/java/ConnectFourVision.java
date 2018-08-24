@@ -35,8 +35,6 @@ public class ConnectFourVision {
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();	
 		
-		// Load the OpenCV Library
-			System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
 			// Load the connect four original image
 			//	Mat originalBoardImage = bufferedImageToMat(awtBufferedImage);

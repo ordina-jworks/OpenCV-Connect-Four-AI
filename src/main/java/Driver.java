@@ -16,7 +16,7 @@ public class Driver {
 	static {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 	}
-		
+	
 	private static DisplayUtil debugDisplay = null;
 	private static final boolean debug = true;
 
@@ -24,7 +24,9 @@ public class Driver {
 
 
 	public static void main(String[] args) {
-
+		// Load the OpenCV Library
+		//TODO fbousson: needs to be moved to driver!
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		connectFourSolver = new ConnectFourSolverImpl();
 		if(debug){
 			debugDisplay = new DisplayUtilAWSImpl();
@@ -70,11 +72,12 @@ public class Driver {
 		//Mat originalBoardImage = imageFileToMat(file);
 
 		int bestMove = -1;
-		try {			
-			debugDisplay = null;
+		try {						
+			StopWatch stopWatch = new StopWatch();
+			stopWatch.start();
 			Board board = connectFourSolver.getBoard(originalBoardImage, debugDisplay);
+			
 			bestMove = connectFourSolver.getBestMove(board);
-			//bestMove = ConnectFourVision.getBoard(originalBoardImage, debugDisplay);
 		} catch (VisionException e) {			
 			e.printStackTrace();
 			
