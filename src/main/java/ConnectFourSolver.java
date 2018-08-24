@@ -11,5 +11,7 @@ public interface ConnectFourSolver {
 
     int getBestMove(Board board);
 
+    int getBestMove(Mat originalBoardImage) throws VisionException;
+
 
 }

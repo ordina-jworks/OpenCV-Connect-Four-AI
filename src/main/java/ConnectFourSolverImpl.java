@@ -39,4 +39,9 @@ public class ConnectFourSolverImpl implements ConnectFourSolver {
         bestMove = minimax.alphaBeta(board.getUserTurn()) + 1;
         return bestMove;
     }
+
+    @Override
+    public int getBestMove(Mat originalBoardImage) throws VisionException {
+        return getBestMove(getBoard(originalBoardImage));
+    }
 }
