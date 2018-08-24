@@ -1,31 +1,16 @@
 
-
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-
 import org.opencv.core.Point;
 import org.opencv.core.Size;
 
-public class Line extends Line2D.Double {
+public class Line {
+	//extends Line2D.Double
+	
 	private static final double RANGE = Math.PI / 8;
 	private double theta;
- 
-	// private Point pt1;
-	// private Point pt2;
-	// private double slope;
-	// private LineType lineType;
 
-//	public Line(LineType lineType) {
-//		super();
-//		// slope = 0;
-//		// this.lineType = lineType;
-//	}
+	
+	private double x1,x2,y1,y2;
 
-//	public Line(int x1, int y1, int x2, int y2) {
-//		super(x1, y1, x2, y2);
-//		// slope = (double) (y1 - y2) / (x1 - x2);
-//		// lineType = LineType.LINE_UNKNOWN;
-//	}
 
 	public Line(double rho, double theta) {
 		this.theta=theta;
@@ -37,53 +22,9 @@ public class Line extends Line2D.Double {
 		y1 = Math.round(y0 + 1000 * (a));
 		x2 = Math.round(x0 - 1000 * (-b));
 		y2 = Math.round(y0 - 1000 * (a));
-		// slope = (pt1.y - pt2.y) / (pt1.x - pt2.x);
-		// if (isInRange(theta, 0, RANGE)
-		// || isInRange(theta, Math.PI - RANGE, Math.PI)) {
-		// orderEndpointsY();
-		// lineType = LineType.LINE_VERTICAL;
-		// } else if (isInRange(theta, Math.PI / 2 - RANGE, Math.PI / 2 +
-		// RANGE)) {
-		// orderEndpointsX();
-		// lineType = LineType.LINE_HORIZONTAL;
-		// } else if (isInRange(theta, Math.PI / 4 - RANGE, Math.PI / 4 + RANGE)
-		// || isInRange(theta, 3 * Math.PI / 4 - RANGE, 3 * Math.PI / 4
-		// + RANGE)) {
-		// lineType = LineType.LINE_DIAGONAL;
-		// } else {
-		// lineType = LineType.LINE_UNKNOWN;
-		// }
+
 	}
 
-	// private void orderEndpointsX() {
-	// if (pt2.x < pt1.x) {
-	// Point temp = pt1;
-	// pt1 = pt2;
-	// pt2 = temp;
-	// }
-	// }
-
-	// private void orderEndpointsY() {
-	// if (pt2.y < pt1.y) {
-	// Point temp = pt1;
-	// pt1 = pt2;
-	// pt2 = temp;
-	// }
-	// }
-
-	// public void addLine(Line line) {
-	// pt1.x += line.pt1.x;
-	// pt1.y += line.pt1.y;
-	// pt2.x += line.pt2.x;
-	// pt2.y += line.pt2.y;
-	// }
-
-	// public void divideLineBy(int n) {
-	// pt1.x /= n;
-	// pt1.y /= n;
-	// pt2.x /= n;
-	// pt2.y /= n;
-	// }
 
 	public Point getPt1() {
 		return new Point(x1, y1);
@@ -93,27 +34,12 @@ public class Line extends Line2D.Double {
 		return new Point(x2, y2);
 	}
 
-	// public LineType getLineType() {
-	// return lineType;
-	// }
 
-	// public double getSlope() {
-	// return slope;
-	// }
-
-	// private boolean isInRange(double val, double lowerBound, double
-	// upperBound) {
-	// return (val >= lowerBound && val < upperBound);
-	// }
-
-	// public String toString() {
-	// return pt1.toString() + " " + pt2.toString();
-	// }
 
 	public Boolean similarTheta(Line line){
 		return (Math.abs(theta-line.theta)<Math.PI/8);
 	}
-	
+
 	public Point getIntersectionPoint(Line line) {
 		if (!intersectsLine(line))
 			return null;
@@ -132,27 +58,81 @@ public class Line extends Line2D.Double {
 		}
 	}
 
-	// public int compareTo(Object object) {
-	// Line line = (Line) object;
-	// if (line.lineType == lineType) {
-	// switch (lineType) {
-	// case LINE_VERTICAL:
-	// if ((pt1.x + pt2.x) < (line.pt1.x + line.pt2.x)) {
-	// return -1;
-	// } else {
-	// return 1;
-	// }
-	// case LINE_HORIZONTAL:
-	// if ((pt1.y + pt2.y) < (line.pt1.y + line.pt2.y)) {
-	// return -1;
-	// } else {
-	// return 1;
-	// }
-	// default:
-	// return 0;
-	// }
-	// } else {
-	// return line.lineType.compareTo(lineType);
-	// }
-	// }
+	public double getX1() {
+		return x1;
+	}
+
+	public double getX2() {
+		return x2;
+	}
+
+	public double getY1() {
+		return y1;
+	}
+
+	public double getY2() {
+		return y2;
+	}
+
+
+	public boolean intersectsLine(Line l) {
+		return linesIntersect(l.getX1(), l.getY1(), l.getX2(), l.getY2(), getX1(), getY1(),
+				getX2(), getY2());
+	}
+
+
+	/**
+	 * Tells whether the two line segments cross.
+	 *
+	 * @param x1
+	 *            the x coordinate of the starting point of the first segment.
+	 * @param y1
+	 *            the y coordinate of the starting point of the first segment.
+	 * @param x2
+	 *            the x coordinate of the end point of the first segment.
+	 * @param y2
+	 *            the y coordinate of the end point of the first segment.
+	 * @param x3
+	 *            the x coordinate of the starting point of the second segment.
+	 * @param y3
+	 *            the y coordinate of the starting point of the second segment.
+	 * @param x4
+	 *            the x coordinate of the end point of the second segment.
+	 * @param y4
+	 *            the y coordinate of the end point of the second segment.
+	 * @return true, if the two line segments cross.
+	 */
+	public static boolean linesIntersect(double x1, double y1, double x2, double y2, double x3,
+										 double y3, double x4, double y4) {
+		/*
+		 * A = (x2-x1, y2-y1) B = (x3-x1, y3-y1) C = (x4-x1, y4-y1) D = (x4-x3,
+		 * y4-y3) = C-B E = (x1-x3, y1-y3) = -B F = (x2-x3, y2-y3) = A-B Result
+		 * is ((AxB) (AxC) <=0) and ((DxE) (DxF) <= 0) DxE = (C-B)x(-B) =
+		 * BxB-CxB = BxC DxF = (C-B)x(A-B) = CxA-CxB-BxA+BxB = AxB+BxC-AxC
+		 */
+		x2 -= x1; // A
+		y2 -= y1;
+		x3 -= x1; // B
+		y3 -= y1;
+		x4 -= x1; // C
+		y4 -= y1;
+		double AvB = x2 * y3 - x3 * y2;
+		double AvC = x2 * y4 - x4 * y2;
+		// Online
+		if (AvB == 0.0 && AvC == 0.0) {
+			if (x2 != 0.0) {
+				return (x4 * x3 <= 0.0)
+						|| ((x3 * x2 >= 0.0) && (x2 > 0.0 ? x3 <= x2 || x4 <= x2 : x3 >= x2
+						|| x4 >= x2));
+			}
+			if (y2 != 0.0) {
+				return (y4 * y3 <= 0.0)
+						|| ((y3 * y2 >= 0.0) && (y2 > 0.0 ? y3 <= y2 || y4 <= y2 : y3 >= y2
+						|| y4 >= y2));
+			}
+			return false;
+		}
+		double BvC = x3 * y4 - x4 * y3;
+		return (AvB * AvC <= 0.0) && (BvC * (AvB + BvC - AvC) <= 0.0);
+	}
 }
