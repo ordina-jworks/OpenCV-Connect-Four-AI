@@ -22,3 +22,7 @@ To install OpenCV (with Java support) through Homebrew, you need to edit the ope
 
 Also make sure to update the gradle build file to point to the correct libs.
 Currently using default install location when using brew on mac.
+
+# How to run
+
+Just run the runDemo script. This will run the correct gradle command and pass in a demo image.
