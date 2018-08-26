@@ -6,7 +6,8 @@ repositories {
 }
 
 dependencies {
-    compile files('/usr/local/Cellar/opencv@2/2.4.13.6_2/share/OpenCV/java/opencv-2413.jar')
+   // compile files('/usr/local/Cellar/opencv@2/2.4.13.6_2/share/OpenCV/java/opencv-2413.jar')
+   compile files('/usr/local/Cellar/opencv/3.4.2/share/OpenCV/java/opencv-342.jar')
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
@@ -17,9 +18,13 @@ run {
   } else {
     args = ["build/resources/main/connect_four.jpg"]
   }
-  systemProperty "java.library.path", "/usr/local/Cellar/opencv@2/2.4.13.6_2/share/OpenCV/java/"
+  //systemProperty "java.library.path", "/usr/local/Cellar/opencv@2/2.4.13.6_2/share/OpenCV/java/"
+  systemProperty "java.library.path", "/usr/local/Cellar/opencv/3.4.2/share/OpenCV/java/"
+  
 }
 
 test {
-    systemProperty "java.library.path", "/usr/local/Cellar/opencv@2/2.4.13.6_2/share/OpenCV/java/"
+    //systemProperty "java.library.path", "/usr/local/Cellar/opencv@2/2.4.13.6_2/share/OpenCV/java/"
+    systemProperty "java.library.path", "/usr/local/Cellar/opencv/3.4.2/share/OpenCV/java/"
+    
 }

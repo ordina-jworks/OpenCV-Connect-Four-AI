@@ -1,3 +1,9 @@
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.core.Size;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -7,12 +13,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
-import org.opencv.core.Size;
-import org.opencv.highgui.Highgui;
-import org.opencv.imgproc.Imgproc;
-
 public class DisplayUtilAWSImpl implements DisplayUtil{
 
 	@Override
@@ -21,7 +21,7 @@ public class DisplayUtilAWSImpl implements DisplayUtil{
 		Imgproc.resize(image, resizedImage,
 				new Size(image.cols(), image.rows()));
 		MatOfByte matOfByte = new MatOfByte();
-		Highgui.imencode(".jpg", resizedImage, matOfByte);
+		Imgcodecs.imencode(".jpg", resizedImage, matOfByte);
 		byte[] byteArray = matOfByte.toArray();
 		showResult(byteArray);
 		

@@ -128,10 +128,10 @@ public class ConnectFourVision {
 	private Mat buildDebugImage(Mat projection, LinkedList<Circle> redTokens, LinkedList<Circle> yellowTokens) {
 		Mat debugImage = new Mat(projection.size(),projection.type(),new Scalar(128,0,0));
 		for(Circle circle : redTokens){
-			Core.circle(debugImage, circle.getCenter(), circle.getRadius(), new Scalar(0,0,255),-1);
+			Imgproc.circle(debugImage, circle.getCenter(), circle.getRadius(), new Scalar(0,0,255),-1);
 		}
 		for(Circle circle : yellowTokens){
-			Core.circle(debugImage, circle.getCenter(), circle.getRadius(), new Scalar(0,255,255),-1);
+			Imgproc.circle(debugImage, circle.getCenter(), circle.getRadius(), new Scalar(0,255,255),-1);
 		}
 		return debugImage;
 	}
@@ -248,7 +248,7 @@ public class ConnectFourVision {
 		for (int i = 0; i < lines.cols(); i++) {
 			double[] info = lines.get(0, i);
 			Line line = new Line(info[0], info[1]);
-			Core.clipLine(
+			Imgproc.clipLine(
 					new Rect(0, 0, boardThreshold.width(), boardThreshold
 							.height()), line.getPt1(), line.getPt2());
 			detectedLines.push(line);
@@ -260,7 +260,7 @@ public class ConnectFourVision {
 			Imgproc.drawContours(debugImage, contours, maxContourIndex, new Scalar(
 				0, 0, 255), 3);
 			for (Line line : detectedLines) {
-				Core.line(debugImage, line.getPt1(), line.getPt2(), new Scalar(0,
+				Imgproc.line(debugImage, line.getPt1(), line.getPt2(), new Scalar(0,
 						255, 0), 3);
 			}
 			
