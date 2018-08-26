@@ -25,7 +25,7 @@ public class Driver {
 
 	public static void main(String[] args) {
 		// Load the OpenCV Library
-		//TODO fbousson: needs to be moved to driver!
+	
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		connectFourSolver = new ConnectFourSolverImpl();
 		if(debug){
