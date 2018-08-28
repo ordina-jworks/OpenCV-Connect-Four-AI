@@ -7,13 +7,29 @@ public class ConnectFourSolverImpl implements ConnectFourSolver {
 
     private ConnectFourVision connectFourVision;
 
+    private DisplayUtil displayUtil;
+
+    public ConnectFourSolverImpl(DisplayUtil displayUtil) {
+        this.displayUtil = displayUtil;
+        connectFourVision = new ConnectFourVision(displayUtil);
+    }
+
+    public DisplayUtil getDisplayUtil() {
+        return displayUtil;
+    }
+
+    public void setDisplayUtil(DisplayUtil displayUtil) {
+        this.displayUtil = displayUtil;
+        connectFourVision.setDisplayUtil(displayUtil);
+    }
+
     public ConnectFourSolverImpl() {
-        connectFourVision = new ConnectFourVision();
+        connectFourVision = new ConnectFourVision(null);
     }
 
     @Override
-    public Board getBoard(byte[] data, DisplayUtil ui) {
-        return connectFourVision.getBoard(data, ui);
+    public Board getBoard(byte[] data) {
+        return connectFourVision.getBoard(data);
     }
 
     @Override
@@ -21,10 +37,6 @@ public class ConnectFourSolverImpl implements ConnectFourSolver {
         return connectFourVision.getBoard(originalBoardImage);
     }
 
-    @Override
-    public Board getBoard(Mat originalBoardImage, DisplayUtil ui) throws VisionException {
-        return connectFourVision.getBoard(originalBoardImage, ui);
-    }
 
     @Override
     public int getBestMove(Board board) {

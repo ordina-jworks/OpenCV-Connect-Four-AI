@@ -1,4 +1,3 @@
-
 import java.util.LinkedList;
 
 import org.opencv.core.Core;
@@ -15,156 +14,169 @@ import org.opencv.imgproc.Imgproc;
 public class ConnectFourVision {
 
 	private static final int NUM_THRESHOLDS = 2;
-	private static final Size MAGIC_SIZE = new Size(622,457);
+	private static final Size MAGIC_SIZE = new Size(622, 457);
 
-
-	public enum SupportedColors{
+	public enum SupportedColors {
 		RED, YELLOW, BLUE;
 	}
-	
 
-	public  Board getBoard(byte[] data, DisplayUtil ui){
-       return null;
+	private DisplayUtil displayUtil;
+
+	public ConnectFourVision(DisplayUtil displayUtil) {
+		this.displayUtil = displayUtil;
 	}
 
-	public  Board getBoard(Mat originalBoardImage) throws VisionException {
-		return getBoard(originalBoardImage, null);
+	public DisplayUtil getDisplayUtil() {
+		return displayUtil;
 	}
 
-	public  Board getBoard(Mat originalBoardImage, DisplayUtil ui) throws VisionException {
+	public void setDisplayUtil(DisplayUtil displayUtil) {
+		this.displayUtil = displayUtil;
+	}
+
+	public Board getBoard(byte[] data) {
+		return null;
+	}
+
+	public Board getBoard(Mat originalBoardImage) throws VisionException {
 		StopWatch stopWatch = new StopWatch();
-		stopWatch.start();	
-		
+		stopWatch.start();
 
-			// Load the connect four original image
-			//	Mat originalBoardImage = bufferedImageToMat(awtBufferedImage);
-	
-			// Resize the image to a more manageable size
-			Imgproc.resize(originalBoardImage, originalBoardImage, MAGIC_SIZE);
-	
-			// Create a copy of the original image to use
-			Mat img = originalBoardImage.clone();
-	
-			if (ui != null) {
-				ui.showResult(img);
-			}
-	
-			// Apply thresholding techniques the board image
-			// Mat boardThreshold = generateBoardThreshold(img);
-			Mat boardThreshold = performThresholdForColor(img,SupportedColors.BLUE);
-			if (ui != null) {
-				ui.showResult(boardThreshold);
-			}
-	
-			// Generate a mask from the thresholded board image
-			Mat projection = generateBoardProjection(boardThreshold.clone(), originalBoardImage, ui);
-			if (ui != null) {
-				ui.showResult(projection);
-			}
-	
-			// Find red tokens in the image
-			LinkedList<Circle> redTokens = findTokens(projection, SupportedColors.RED);
-			System.out.println("Found " + redTokens.size() + " red tokens.");
-	
-			// Find yellow tokens in the image
-			LinkedList<Circle> yellowTokens = findTokens(projection, SupportedColors.YELLOW);
-			System.out.println("Found " + yellowTokens.size() + " yellow tokens.");
-	
-			// Create and display debug image for how the computer sees the game board
-			if (ui != null) {
-				ui.showResult(buildDebugImage(projection, redTokens, yellowTokens));
-			}
-	
-			// Verify the number of tokens
-			int tokenDifference = redTokens.size() - yellowTokens.size();
-			if (Math.abs(tokenDifference) > 1) {
-				throw new VisionException("Invalid numbers of game pieces.");
-			}
-	
-			// Calculate the supposed positions of the pieces
-			Board board = calculateTokenPositions(projection.size(), redTokens,
-					yellowTokens);
-			board.display();
+		// Load the connect four original image
+		// Mat originalBoardImage = bufferedImageToMat(awtBufferedImage);
 
+		// Resize the image to a more manageable size
+		Imgproc.resize(originalBoardImage, originalBoardImage, MAGIC_SIZE);
 
-			// Find whose turn it is
-			char userTurn = board.getUserTurn();
+		// Create a copy of the original image to use
+		Mat img = originalBoardImage.clone();
+
+		if (displayUtil != null) {
+			displayUtil.showResult(img);
+		}
+
+		// Apply thresholding techniques the board image
+		// Mat boardThreshold = generateBoardThreshold(img);
+		Mat boardThreshold = performThresholdForColor(img, SupportedColors.BLUE);
+		if (displayUtil != null) {
+			displayUtil.showResult(boardThreshold);
+		}
+
+		// Generate a mask from the thresholded board image
+		Mat projection = generateBoardProjection(boardThreshold.clone(), originalBoardImage, displayUtil);
+		if (displayUtil != null) {
+			displayUtil.showResult(projection);
+		}
+
+		// Find red tokens in the image
+		LinkedList<Circle> redTokens = findTokens(projection, SupportedColors.RED);
+		System.out.println("Found " + redTokens.size() + " red tokens.");
+
+		// Find yellow tokens in the image
+		LinkedList<Circle> yellowTokens = findTokens(projection, SupportedColors.YELLOW);
+		System.out.println("Found " + yellowTokens.size() + " yellow tokens.");
+
+		// Create and display debug image for how the computer sees the game board
+		if (displayUtil != null) {
+			displayUtil.showResult(buildDebugImage(projection, redTokens, yellowTokens));
+		}
+
+		// Verify the number of tokens
+		int tokenDifference = redTokens.size() - yellowTokens.size();
+		if (Math.abs(tokenDifference) > 1) {
+			throw new VisionException("Invalid numbers of game pieces.");
+		}
+
+		// Calculate the supposed positions of the pieces
+		Board board = calculateTokenPositions(projection.size(), redTokens, yellowTokens);
+		board.display();
+
+		// Find whose turn it is
+		char userTurn = board.getUserTurn();
 
 		/**
-		 * 	// Find whose turn it is
-		 char userTurn = Board.MARK_RED;
-		 if (tokenDifference > 0) {
-		 userTurn = Board.MARK_BLACK;
-		 }
+		 * // Find whose turn it is char userTurn = Board.MARK_RED; if (tokenDifference
+		 * > 0) { userTurn = Board.MARK_BLACK; }
 		 */
 
+		// Display whose turn it is
+		if (userTurn == Board.MARK_RED) {
+			System.out.println("It is Red's turn.");
+		} else {
+			System.out.println("It is Yellow's turn.");
+		}
 
-			// Display whose turn it is
-			if(userTurn == Board.MARK_RED){
-				System.out.println("It is Red's turn.");
-			}else{
-				System.out.println("It is Yellow's turn.");
-			}
-	
-			// Initialize the minimax structure to find a good move
-			System.out.println("Elapsed time building board " + stopWatch.getElapsedTime());
-			//Dont do anything if the board hasnt changed. 
-			/**
-			 * Elapsed time building board 38
-			*	Total Elapsed time 257
+		// Initialize the minimax structure to find a good move
+		System.out.println("Elapsed time building board " + stopWatch.getElapsedTime());
+		// Dont do anything if the board hasnt changed.
+		/**
+		 * Elapsed time building board 38 Total Elapsed time 257
+		 * 
+		 * On almost empty board: Elapsed time building board 49 Total elapsed time 941
+		 */
 
-			On almost empty board:
-			Elapsed time building board 49
-			Total elapsed time 941
-			 */
+		stopWatch.stop();
+		System.out.println("Total elapsed time " + stopWatch.getElapsedTime());
 
-			stopWatch.stop();
-			System.out.println("Total elapsed time " + stopWatch.getElapsedTime());
-	
-			return board;
+		return board;
 
 	}
 
 	private Mat buildDebugImage(Mat projection, LinkedList<Circle> redTokens, LinkedList<Circle> yellowTokens) {
-		Mat debugImage = new Mat(projection.size(),projection.type(),new Scalar(128,0,0));
-		for(Circle circle : redTokens){
-			Imgproc.circle(debugImage, circle.getCenter(), circle.getRadius(), new Scalar(0,0,255),-1);
+		Mat debugImage = new Mat(projection.size(), projection.type(), new Scalar(128, 0, 0));
+		for (Circle circle : redTokens) {
+			Imgproc.circle(debugImage, circle.getCenter(), circle.getRadius(), new Scalar(0, 0, 255), -1);
 		}
-		for(Circle circle : yellowTokens){
-			Imgproc.circle(debugImage, circle.getCenter(), circle.getRadius(), new Scalar(0,255,255),-1);
+		for (Circle circle : yellowTokens) {
+			Imgproc.circle(debugImage, circle.getCenter(), circle.getRadius(), new Scalar(0, 255, 255), -1);
 		}
 		return debugImage;
 	}
 
-
 	// Returns a binary image of the board based on the specified color
-	private Mat performThresholdForColor(Mat image, SupportedColors color){
+	private Mat performThresholdForColor(Mat image, SupportedColors color) {
 		Mat imageHSV = new Mat();
+
+		// TODO FBOUSSON: NEEDED FOR ANDROID
+		// Imgproc.cvtColor(image, image, Imgproc.COLOR_RGB2BGR);
 		Imgproc.cvtColor(image, imageHSV, Imgproc.COLOR_RGB2HSV);
 		Mat threshold = new Mat();
-		if(color == SupportedColors.BLUE){
-			//TODO fbousson make sure the blue is actually blue..
-		Core.inRange(imageHSV, new Scalar(0,160,60), new Scalar(15,255,255), threshold);		
-		//Core.inRange(imageHSV, new Scalar(110,50,50), new Scalar(130,255,255), threshold);
-	//		Core.inRange(imageHSV, new Scalar(50,155,255), new Scalar(0,0,102), threshold);
-		}else if(color == SupportedColors.RED){
-			Core.inRange(imageHSV, new Scalar(120,160,60), new Scalar(130,255,255), threshold);
-		}else if(color == SupportedColors.YELLOW){
-			Core.inRange(imageHSV, new Scalar(90,160,60), new Scalar(100,255,255), threshold);
+
+		Scalar lower;
+		Scalar upper;
+
+		switch (color) {
+		case BLUE:
+			lower = new Scalar(0, 160, 60);
+			upper = new Scalar(15, 255, 255);
+			break;
+		case RED:
+			lower = new Scalar(120, 160, 60);
+			upper = new Scalar(130, 255, 255);
+			break;
+		case YELLOW:
+			lower = new Scalar(90, 160, 60);
+			upper = new Scalar(100, 255, 255);
+			break;
+
+		default:
+			throw new IllegalArgumentException("Unsupported color: " + color);
 		}
+
+		Core.inRange(imageHSV, lower, upper, threshold);
+
 		return threshold;
 	}
 
-	private Board calculateTokenPositions(Size boardBounds,
-			LinkedList<Circle> redTokens, LinkedList<Circle> yellowTokens) {
+	private Board calculateTokenPositions(Size boardBounds, LinkedList<Circle> redTokens,
+			LinkedList<Circle> yellowTokens) {
 		Board result = new Board();
 		final float BLOCK_WIDTH = (float) boardBounds.width / Board.COLUMNS;
 		final float BLOCK_HEIGHT = (float) boardBounds.height / Board.ROWS;
 		for (int row = 0; row < Board.ROWS; row++) {
 			for (int col = 0; col < Board.COLUMNS; col++) {
 				Point point = new Point(col * BLOCK_WIDTH + BLOCK_WIDTH / 2,
-						(Board.ROWS - row - 1) * BLOCK_HEIGHT + BLOCK_HEIGHT
-								/ 2);
+						(Board.ROWS - row - 1) * BLOCK_HEIGHT + BLOCK_HEIGHT / 2);
 				for (Circle token : redTokens) {
 					if (token.containsPoint(point)) {
 						result.set(col, Board.MARK_RED);
@@ -182,26 +194,24 @@ public class ConnectFourVision {
 		return result;
 	}
 
-	private LinkedList<Circle> findTokens(Mat sourceImage,
-		SupportedColors tokenColor) {
-		//Mat boardDist = distanceMatrixFromColor(sourceImage, tokenColor);
-		//Mat boardThreshold = new Mat();
-		//Imgproc.threshold(boardDist, boardThreshold, 80, 255,
-		//		Imgproc.THRESH_BINARY_INV);
+	private LinkedList<Circle> findTokens(Mat sourceImage, SupportedColors tokenColor) {
+		// Mat boardDist = distanceMatrixFromColor(sourceImage, tokenColor);
+		// Mat boardThreshold = new Mat();
+		// Imgproc.threshold(boardDist, boardThreshold, 80, 255,
+		// Imgproc.THRESH_BINARY_INV);
 		Mat boardThreshold = performThresholdForColor(sourceImage, tokenColor);
-		//Imgproc.dilate(boardThreshold, boardThreshold, new Mat());
+		// Imgproc.dilate(boardThreshold, boardThreshold, new Mat());
 		LinkedList<MatOfPoint> contours = new LinkedList<MatOfPoint>();
 		Mat hierarchy = new Mat();
-		Imgproc.findContours(boardThreshold, contours, hierarchy,
-				Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0));
+		Imgproc.findContours(boardThreshold, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE,
+				new Point(0, 0));
 		LinkedList<Circle> minCircles = new LinkedList<Circle>();
 		for (int i = 0; i < contours.size(); i++) {
 			double area = Imgproc.contourArea(contours.get(i));
 			if (area > 200) {
 				Point center = new Point();
 				float[] radius = new float[1];
-				Imgproc.minEnclosingCircle(new MatOfPoint2f(contours.get(i)
-						.toArray()), center, radius);
+				Imgproc.minEnclosingCircle(new MatOfPoint2f(contours.get(i).toArray()), center, radius);
 				Circle circle = new Circle(center, (int) radius[0] + 5);
 				minCircles.push(circle);
 			}
@@ -215,8 +225,8 @@ public class ConnectFourVision {
 		// Find the polygon enclosing the blue connect four board
 		LinkedList<MatOfPoint> contours = new LinkedList<MatOfPoint>();
 		Mat hierarchy = new Mat();
-		Imgproc.findContours(boardThreshold, contours, hierarchy,
-				Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0));
+		Imgproc.findContours(boardThreshold, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE,
+				new Point(0, 0));
 		int maxContourIndex = 0;
 		double maxArea = 0;
 		for (int i = 0; i < contours.size(); i++) {
@@ -228,45 +238,55 @@ public class ConnectFourVision {
 		}
 
 		// Calculate the percent of the image the detected blue area makes up
-		double percentSpace = maxArea
-				/ (boardThreshold.width() * boardThreshold.height()) * 100;
-		System.out.println("The board occupies " + Math.round(percentSpace)
-				+ "% of the image.");
+		double percentSpace = maxArea / (boardThreshold.width() * boardThreshold.height()) * 100;
+		System.out.println("The board occupies " + Math.round(percentSpace) + "% of the image.");
 
 		// Throw an exception if the detected blue area is too small
 		if (percentSpace < 20) {
 			throw new VisionException("A sufficiently large board could not be detected.");
 		}
 
+		MatOfPoint maxContour = contours.get(maxContourIndex);
+		Rect rect = calculateRectangle(maxContour);
+
+		Mat rectangled = originalBoardImage.clone();
+		Imgproc.rectangle(originalBoardImage, new Point(rect.x, rect.y),
+				new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255), 10);
+
+		ui.showResult(rectangled);
+
+		return new Mat(originalBoardImage.clone(), rect);
+
+		// return warped(boardThreshold, originalBoardImage, ui, contours,
+		// maxContourIndex);
+
+	}
+
+	private Mat warped(Mat boardThreshold, Mat originalBoardImage, DisplayUtil ui, LinkedList<MatOfPoint> contours,
+			int maxContourIndex) throws VisionException {
 		// Find possible border lines of the enclosing polygon
 		Mat newImage = Mat.zeros(boardThreshold.size(), boardThreshold.type());
-		Imgproc.drawContours(newImage, contours, maxContourIndex, new Scalar(
-				255));
+		Imgproc.drawContours(newImage, contours, maxContourIndex, new Scalar(255));
 		Mat lines = new Mat();
 		Imgproc.HoughLines(newImage, lines, 1, Math.PI / 180, 75);
 		LinkedList<Line> detectedLines = new LinkedList<Line>();
 		for (int i = 0; i < lines.cols(); i++) {
 			double[] info = lines.get(0, i);
 			Line line = new Line(info[0], info[1]);
-			Imgproc.clipLine(
-					new Rect(0, 0, boardThreshold.width(), boardThreshold
-							.height()), line.getPt1(), line.getPt2());
+			Imgproc.clipLine(new Rect(0, 0, boardThreshold.width(), boardThreshold.height()), line.getPt1(),
+					line.getPt2());
 			detectedLines.push(line);
 		}
-		System.out.println("There are " + detectedLines.size()
-				+ " lines that were detected.");
+		System.out.println("There are " + detectedLines.size() + " lines that were detected.");
 		if (ui != null) {
 			Mat debugImage = originalBoardImage.clone();
-			Imgproc.drawContours(debugImage, contours, maxContourIndex, new Scalar(
-				0, 0, 255), 3);
+			Imgproc.drawContours(debugImage, contours, maxContourIndex, new Scalar(0, 0, 255), 3);
 			for (Line line : detectedLines) {
-				Imgproc.line(debugImage, line.getPt1(), line.getPt2(), new Scalar(0,
-						255, 0), 3);
+				Imgproc.line(debugImage, line.getPt1(), line.getPt2(), new Scalar(0, 255, 0), 3);
 			}
-			
+
 			ui.showResult(debugImage);
-			
-			
+
 		}
 
 		// Get the corners of the polygon and apply the transform
@@ -285,13 +305,36 @@ public class ConnectFourVision {
 		Mat dst = new Mat(resultSize, originalBoardImage.type());
 		Imgproc.warpPerspective(originalBoardImage, dst, transform, dst.size());
 		return dst;
+	}
 
+	private Rect calculateRectangle(MatOfPoint maxContour) {
+		// http://answers.opencv.org/question/25755/drawing-bounding-box-in-java/
+
+		Rect rect = Imgproc.boundingRect(maxContour);
+
+		/**
+		 *
+		 * 
+		 * MatOfPoint2f approxCurve = new MatOfPoint2f();
+		 * 
+		 * //Convert contours(i) from MatOfPoint to MatOfPoint2f MatOfPoint2f contour2f
+		 * = new MatOfPoint2f( maxContour.toArray() ); //Processing on mMOP2f1 which is
+		 * in type MatOfPoint2f double approxDistance = Imgproc.arcLength(contour2f,
+		 * true)*0.02; Imgproc.approxPolyDP(contour2f, approxCurve, approxDistance,
+		 * true);
+		 * 
+		 * //Convert back to MatOfPoint MatOfPoint points = new MatOfPoint(
+		 * approxCurve.toArray() );
+		 * 
+		 * // Get bounding rect of contour Rect rect = Imgproc.boundingRect(points);
+		 */
+
+		return rect;
 	}
 
 	// Given lists of horizontal and vertical lines on the border of the image,
 	// determine the border rectangle of the image
-	private Mat calculateBorderFromLines(LinkedList<Line> lines)
-			throws VisionException {
+	private Mat calculateBorderFromLines(LinkedList<Line> lines) throws VisionException {
 
 		// Create a list of every intersection
 		LinkedList<Point> points = new LinkedList<Point>();
@@ -331,11 +374,9 @@ public class ConnectFourVision {
 			}
 		}
 
-		if (topLeftPoints.size() == 0 || topRightPoints.size() == 0
-				|| bottomLeftPoints.size() == 0
+		if (topLeftPoints.size() == 0 || topRightPoints.size() == 0 || bottomLeftPoints.size() == 0
 				|| bottomRightPoints.size() == 0) {
-			throw new VisionException(
-					"Could not identify the corners of the game board.");
+			throw new VisionException("Could not identify the corners of the game board.");
 		}
 
 		// Average the points in each of the categories

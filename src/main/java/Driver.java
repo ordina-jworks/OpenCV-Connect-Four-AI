@@ -27,10 +27,14 @@ public class Driver {
 		// Load the OpenCV Library
 	
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		connectFourSolver = new ConnectFourSolverImpl();
+		System.out.print("Library: " + Core.NATIVE_LIBRARY_NAME) ;
+		
+	
 		if(debug){
 			debugDisplay = new DisplayUtilAWSImpl();
 		}
+
+		connectFourSolver = new ConnectFourSolverImpl(debugDisplay);
 		//CameraBridgeViewBase	
 		//https://gist.github.com/jayrambhia/5265868
 
@@ -75,7 +79,7 @@ public class Driver {
 		try {						
 			StopWatch stopWatch = new StopWatch();
 			stopWatch.start();
-			Board board = connectFourSolver.getBoard(originalBoardImage, debugDisplay);
+			Board board = connectFourSolver.getBoard(originalBoardImage);
 			
 			bestMove = connectFourSolver.getBestMove(board);
 		} catch (VisionException e) {			

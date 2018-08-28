@@ -1,1 +1,1 @@
-gradle run --args 'build/resources/main/connect_four.jpg'
+gradle run --args 'testimages/connect_four.jpg'
