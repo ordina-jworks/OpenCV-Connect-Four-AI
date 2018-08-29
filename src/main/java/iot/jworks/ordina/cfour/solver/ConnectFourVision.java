@@ -179,14 +179,14 @@ public class ConnectFourVision {
 
 	public Mat drawBestMove(Solution solution){
 
-		//we have best column, find best row!
-		//starting from bottom at 0, moving up
-		int row = 4;
-		row = 5;
+
 		//Starting from 1, counting towards the right
 		int column = solution.getBestMove();
-		column = 7;
-
+		
+		//we have best column, find best row!
+		//starting from bottom at 0, moving up
+		int row = solution.getBoardInformation().getBoard().getTokensForColumn(column - 1);
+		
 		Mat projection = solution.getBoardInformation().getProjection();
 		Size boardBounds = projection.size();
 
@@ -197,14 +197,8 @@ public class ConnectFourVision {
 		//average block height and block width to get radius
 		int circleRadius = (int)(BLOCK_HEIGHT + BLOCK_WIDTH) / 4 * 2 / 3;
 
-		//color orange
-		//rgb(255,165,0)
-		Scalar orange = new Scalar(0,165,255);
-
-		//TODO validate
-	//	double x = BLOCK_WIDTH * column - (BLOCK_WIDTH / 2);
-	//	double y = BLOCK_HEIGHT * row + (BLOCK_HEIGHT /2);
-
+			
+		Scalar orange = new Scalar(7,104,233);
 
 	    //x is pointing right
 		double x = BLOCK_WIDTH * column - (BLOCK_WIDTH / 2) ;
@@ -212,8 +206,7 @@ public class ConnectFourVision {
 		//y is pointing down
 		double y = (BLOCK_HEIGHT *  Board.ROWS) - (BLOCK_HEIGHT * row + (BLOCK_HEIGHT /2));
 
-		
-
+	
 		Point center = new Point( x,y);
 		Circle bestMoveCircle = new Circle(center, circleRadius);
 

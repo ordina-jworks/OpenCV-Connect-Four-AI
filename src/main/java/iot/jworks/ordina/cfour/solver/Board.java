@@ -434,4 +434,23 @@ public class Board {
         }
         return userTurn;
     }
+
+    /**
+     * Counting from 0
+     */
+    public int getTokensForColumn(int zeroCountingColumn){        
+        int tokensForColumn = 0;
+               
+        for(int i = 0 ; i < ROWS; i++ ){
+           char value = board[i][zeroCountingColumn];
+           System.out.println("Evaluation value: " + value + " at index " + i);     
+           if(Board.UNMARKED != value){
+            tokensForColumn++;
+           }     
+        }
+
+        //counting from top
+        return tokensForColumn;
+    }
+
 }
