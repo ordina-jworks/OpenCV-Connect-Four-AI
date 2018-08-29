@@ -1,4 +1,4 @@
-
+package iot.jworks.ordina.cfour.solver;
 
 public class VisionException extends Exception {
 

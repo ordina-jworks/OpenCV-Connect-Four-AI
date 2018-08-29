@@ -1,3 +1,5 @@
+package iot.jworks.ordina.cfour.solver;
+
 import java.util.Arrays;
 
 /**

@@ -1,3 +1,4 @@
+package iot.jworks.ordina.cfour.solver;
 
 public enum LineType {
 	LINE_DIAGONAL, LINE_HORIZONTAL, LINE_VERTICAL, LINE_UNKNOWN

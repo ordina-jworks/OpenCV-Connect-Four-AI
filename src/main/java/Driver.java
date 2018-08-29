@@ -1,4 +1,3 @@
-
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
@@ -10,6 +9,14 @@ import javax.imageio.ImageIO;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+
+import iot.jworks.ordina.cfour.solver.BoardInformation;
+import iot.jworks.ordina.cfour.solver.Solution;
+import iot.jworks.ordina.cfour.solver.DisplayUtil;
+import iot.jworks.ordina.cfour.solver.VisionException;
+import iot.jworks.ordina.cfour.solver.StopWatch;
+import iot.jworks.ordina.cfour.solver.ConnectFourSolver;
+import iot.jworks.ordina.cfour.solver.ConnectFourSolverImpl;
 
 public class Driver {
 
@@ -75,22 +82,29 @@ public class Driver {
 		//Issues when not using bufferedImage. Odd.
 		//Mat originalBoardImage = imageFileToMat(file);
 
-		int bestMove = -1;
+		Solution solution = null;
 		try {						
 			StopWatch stopWatch = new StopWatch();
 			stopWatch.start();
-			Board board = connectFourSolver.getBoard(originalBoardImage);
+			BoardInformation boardInformation = connectFourSolver.getBoard(originalBoardImage);
 			
-			bestMove = connectFourSolver.getBestMove(board);
+			solution = connectFourSolver.getBestMove(boardInformation);
 		} catch (VisionException e) {			
 			e.printStackTrace();
 			
 		}
-		if(bestMove > -1){
-			System.out.println("Best Move:" + bestMove);
+		if(solution != null){
+			System.out.println("Best Move:" + solution.getBestMove());
+			if(debugDisplay != null){
+				//debugDisplay.showResult(solution.)
+			}
 		}else{
 			System.err.println("Failed for file: " + file.getName());
 		}
+
+
+
+
 
 		
 	}

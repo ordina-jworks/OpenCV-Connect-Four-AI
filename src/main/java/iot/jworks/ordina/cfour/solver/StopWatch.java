@@ -1,3 +1,5 @@
+package iot.jworks.ordina.cfour.solver;
+
 public class StopWatch {
 
     private long startTime = 0;

@@ -13,9 +13,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import iot.jworks.ordina.cfour.solver.DisplayUtil;
+
 public class DisplayUtilAWSImpl implements DisplayUtil{
 
-	@Override
+	
 	public void showResult(Mat image) {
 		Mat resizedImage = new Mat();
 		Imgproc.resize(image, resizedImage,
@@ -28,7 +30,7 @@ public class DisplayUtilAWSImpl implements DisplayUtil{
 		
 	}
 
-	@Override
+
 	public void showResult(byte[] byteArray) {
 		try {
 			InputStream in = new ByteArrayInputStream(byteArray);

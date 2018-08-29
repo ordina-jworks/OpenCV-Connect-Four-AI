@@ -1,3 +1,4 @@
+package iot.jworks.ordina.cfour.solver;
 
 /**
  * File: Minimax.java
