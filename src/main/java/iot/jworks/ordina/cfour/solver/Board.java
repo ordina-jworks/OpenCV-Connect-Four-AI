@@ -442,8 +442,7 @@ public class Board {
         int tokensForColumn = 0;
                
         for(int i = 0 ; i < ROWS; i++ ){
-           char value = board[i][zeroCountingColumn];
-           System.out.println("Evaluation value: " + value + " at index " + i);     
+           char value = board[i][zeroCountingColumn];         
            if(Board.UNMARKED != value){
             tokensForColumn++;
            }     
