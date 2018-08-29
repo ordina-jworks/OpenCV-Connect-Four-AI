@@ -60,4 +60,9 @@ public class ConnectFourSolverImpl implements ConnectFourSolver {
     public Solution getBestMove(Mat originalBoardImage) throws VisionException {
         return getBestMove(getBoard(originalBoardImage));
     }
+
+    @Override
+    public Mat drawBestMove(Solution solution){
+        return connectFourVision.drawBestMove(solution);
+    }
 }

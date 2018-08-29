@@ -27,7 +27,6 @@ public class DisplayUtilAWSImpl implements DisplayUtil{
 		byte[] byteArray = matOfByte.toArray();
 		showResult(byteArray);
 		
-		
 	}
 
 

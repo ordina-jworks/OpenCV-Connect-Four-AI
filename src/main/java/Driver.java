@@ -97,15 +97,11 @@ public class Driver {
 			System.out.println("Best Move:" + solution.getBestMove());
 			if(debugDisplay != null){
 				//debugDisplay.showResult(solution.)
+				debugDisplay.showResult(connectFourSolver.drawBestMove(solution));
 			}
 		}else{
 			System.err.println("Failed for file: " + file.getName());
 		}
-
-
-
-
-
 		
 	}
 	private static byte[] getBytes(BufferedImage img) {

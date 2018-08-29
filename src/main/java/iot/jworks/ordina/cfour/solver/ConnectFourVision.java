@@ -114,8 +114,8 @@ public class ConnectFourVision {
 			stopWatch.stop();
 
 			BoardInformation boardInformation = new BoardInformation(computerView, board);
+			boardInformation.setProjection(projection);
 			boardInformation.setComputerVisionCalculationDuration(stopWatch.getElapsedTime());
-
 			return boardInformation;
 
 	}
@@ -180,8 +180,12 @@ public class ConnectFourVision {
 	public Mat drawBestMove(Solution solution){
 
 		//we have best column, find best row!
-
-		int row = 2;
+		//starting from bottom at 0, moving up
+		int row = 4;
+		row = 5;
+		//Starting from 1, counting towards the right
+		int column = solution.getBestMove();
+		column = 7;
 
 		Mat projection = solution.getBoardInformation().getProjection();
 		Size boardBounds = projection.size();
@@ -191,16 +195,27 @@ public class ConnectFourVision {
 
 
 		//average block height and block width to get radius
-		final float CIRCLE_RADIUS = (BLOCK_HEIGHT + BLOCK_WIDTH) / 4;
+		int circleRadius = (int)(BLOCK_HEIGHT + BLOCK_WIDTH) / 4 * 2 / 3;
 
 		//color orange
-		Scalar orange = new Scalar(0,100,255);
+		//rgb(255,165,0)
+		Scalar orange = new Scalar(0,165,255);
+
+		//TODO validate
+	//	double x = BLOCK_WIDTH * column - (BLOCK_WIDTH / 2);
+	//	double y = BLOCK_HEIGHT * row + (BLOCK_HEIGHT /2);
 
 
-		//TODO
-		Point center = new Point();
-		int radius = 10;
-		Circle bestMoveCircle = new Circle(center, radius);
+	    //x is pointing right
+		double x = BLOCK_WIDTH * column - (BLOCK_WIDTH / 2) ;
+
+		//y is pointing down
+		double y = (BLOCK_HEIGHT *  Board.ROWS) - (BLOCK_HEIGHT * row + (BLOCK_HEIGHT /2));
+
+		
+
+		Point center = new Point( x,y);
+		Circle bestMoveCircle = new Circle(center, circleRadius);
 
 		Mat solved = projection.clone();
 
