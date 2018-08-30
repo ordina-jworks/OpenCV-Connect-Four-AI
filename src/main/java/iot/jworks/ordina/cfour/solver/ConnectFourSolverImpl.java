@@ -31,10 +31,15 @@ public class ConnectFourSolverImpl implements ConnectFourSolver {
     }
 
 
-
     @Override
-    public BoardInformation getBoard(Mat originalBoardImage) throws VisionException {
-        return connectFourVision.getBoard(originalBoardImage);
+    public BoardInformation getBoard(Mat originalBoardImage){
+        try{
+            BoardInformation boardInformation = connectFourVision.getBoard(originalBoardImage);
+            return boardInformation;
+        }catch(VisionException e){
+            return new BoardInformation(e.getMessage());
+        }
+
     }
 
 
@@ -42,8 +47,14 @@ public class ConnectFourSolverImpl implements ConnectFourSolver {
     public Solution getBestMove(BoardInformation boardInformation) {
         if(previousSolution != null && previousSolution.getBoardInformation() != null && previousSolution.getBoardInformation().getBoard() != null && previousSolution.getBoardInformation().getBoard().equals(boardInformation.getBoard())){
             System.out.println("Same board configuration. Returning last known bestmove "  + previousSolution.getBestMove());
+            previousSolution.setAiSolverDuration(Math.abs(previousSolution.getAiSolverDuration()) * -1);
             return previousSolution;
         }
+
+        if(boardInformation.getComputerVisionError() != null){
+            return new Solution(boardInformation);
+        }
+
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -57,7 +68,7 @@ public class ConnectFourSolverImpl implements ConnectFourSolver {
     }
 
     @Override
-    public Solution getBestMove(Mat originalBoardImage) throws VisionException {
+    public Solution getBestMove(Mat originalBoardImage){
         return getBestMove(getBoard(originalBoardImage));
     }
 

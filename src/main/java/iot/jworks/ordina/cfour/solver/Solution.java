@@ -52,4 +52,13 @@ public class Solution {
                 ", aiSolverDuration=" + aiSolverDuration +
                 '}';
     }
+
+    public String getCurrentPlayer() {
+        String player = "undefined";
+        if(boardInformation != null && boardInformation.getBoard() != null){
+            player = Board.MARK_RED == boardInformation.getBoard().getUserTurn() ? "Red" : "Yellow";
+        }
+
+        return player;
+    }
 }

@@ -97,7 +97,7 @@ public class Driver {
 			System.out.println("Best Move:" + solution.getBestMove());
 			if(debugDisplay != null){
 				//debugDisplay.showResult(solution.)
-				debugDisplay.showResult(connectFourSolver.drawBestMove(solution));
+				debugDisplay.showResult(connectFourSolver.drawBestMove(solution), "Magic position");
 			}
 		}else{
 			System.err.println("Failed for file: " + file.getName());

@@ -18,23 +18,24 @@ import iot.jworks.ordina.cfour.solver.DisplayUtil;
 public class DisplayUtilAWSImpl implements DisplayUtil{
 
 	
-	public void showResult(Mat image) {
+	public void showResult(Mat image, String message) {
 		Mat resizedImage = new Mat();
 		Imgproc.resize(image, resizedImage,
 				new Size(image.cols(), image.rows()));
 		MatOfByte matOfByte = new MatOfByte();
 		Imgcodecs.imencode(".jpg", resizedImage, matOfByte);
 		byte[] byteArray = matOfByte.toArray();
-		showResult(byteArray);
+		showResult(byteArray, message);
 		
 	}
 
 
-	public void showResult(byte[] byteArray) {
+	public void showResult(byte[] byteArray, String message) {
 		try {
 			InputStream in = new ByteArrayInputStream(byteArray);
 			BufferedImage bufImage = ImageIO.read(in);
 			JFrame frame = new JFrame();
+			frame.setTitle(message);
 			frame.getContentPane().add(new JLabel(new ImageIcon(bufImage)));
 			frame.pack();
 			frame.setVisible(true);
@@ -42,6 +43,8 @@ public class DisplayUtilAWSImpl implements DisplayUtil{
 			e.printStackTrace();
 		}
 	}
+
+
 
 
 }

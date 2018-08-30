@@ -358,6 +358,15 @@ public class Board {
 
     //TODO untested
     public boolean equals(Board otherBoard){
+
+        if(otherBoard == null || this.getBoardArray() == null){
+            return false;
+        }
+
+        if(otherBoard.getBoardArray() == null){
+            return false;
+        }
+
         return equals(this.getBoardArray(), otherBoard.getBoardArray());
     }
 

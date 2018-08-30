@@ -4,11 +4,11 @@ import org.opencv.core.Mat;
 
 public interface ConnectFourSolver {
 
-    BoardInformation getBoard(Mat originalBoardImage) throws VisionException;
+    BoardInformation getBoard(Mat originalBoardImage);
 
     Solution getBestMove(BoardInformation boardInformation);
 
-    Solution getBestMove(Mat originalBoardImage) throws VisionException;
+    Solution getBestMove(Mat originalBoardImage);
 
     Mat drawBestMove(Solution solution);
 

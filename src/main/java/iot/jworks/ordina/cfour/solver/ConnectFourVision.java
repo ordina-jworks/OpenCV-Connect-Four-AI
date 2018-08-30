@@ -22,7 +22,67 @@ public class ConnectFourVision {
 
 
 	public enum SupportedColors{
-		RED, YELLOW, BLUE, MYBLUE;
+		RED, YELLOW, BLUE
+	}
+
+
+	private static Scalar lowerBlue = new Scalar(0, 160, 60);
+	private static Scalar upperBlue = new Scalar(15, 255, 255);
+
+
+	private static Scalar lowerRed = new Scalar(120, 160, 60);
+	private static Scalar upperRed = new Scalar(130, 255, 255);
+
+
+	private static Scalar lowerYellow = new Scalar(90, 160, 60);
+	private static Scalar upperYellow = new Scalar(100, 255, 255);
+
+	public static Scalar getLowerBlue() {
+		return lowerBlue;
+	}
+
+	public static void setLowerBlue(Scalar lowerBlue) {
+		ConnectFourVision.lowerBlue = lowerBlue;
+	}
+
+	public static Scalar getUpperBlue() {
+		return upperBlue;
+	}
+
+	public static void setUpperBlue(Scalar upperBlue) {
+		ConnectFourVision.upperBlue = upperBlue;
+	}
+
+	public static Scalar getLowerRed() {
+		return lowerRed;
+	}
+
+	public static void setLowerRed(Scalar lowerRed) {
+		ConnectFourVision.lowerRed = lowerRed;
+	}
+
+	public static Scalar getUpperRed() {
+		return upperRed;
+	}
+
+	public static void setUpperRed(Scalar upperRed) {
+		ConnectFourVision.upperRed = upperRed;
+	}
+
+	public static Scalar getLowerYellow() {
+		return lowerYellow;
+	}
+
+	public static void setLowerYellow(Scalar lowerYellow) {
+		ConnectFourVision.lowerYellow = lowerYellow;
+	}
+
+	public static Scalar getUpperYellow() {
+		return upperYellow;
+	}
+
+	public static void setUpperYellow(Scalar upperYellow) {
+		ConnectFourVision.upperYellow = upperYellow;
 	}
 
 	private DisplayUtil displayUtil;
@@ -41,7 +101,7 @@ public class ConnectFourVision {
 	}
 
 
-	public  BoardInformation getBoard(Mat originalBoardImage) throws VisionException {
+	public  BoardInformation getBoard(Mat originalBoardImage){
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();	
 		
@@ -56,20 +116,20 @@ public class ConnectFourVision {
 			Mat img = originalBoardImage.clone();
 	
 			if (displayUtil != null) {
-				displayUtil.showResult(img);
+				displayUtil.showResult(img.clone(), "original board");
 			}
 	
 			// Apply thresholding techniques the board image
 			// Mat boardThreshold = generateBoardThreshold(img);
 			Mat boardThreshold = performThresholdForColor(img,SupportedColors.BLUE);
 			if (displayUtil != null) {
-				displayUtil.showResult(boardThreshold);
+				displayUtil.showResult(boardThreshold.clone(), "boardThreshold" );
 			}
 	
 			// Generate a mask from the thresholded board image
 			Mat projection = generateBoardProjection(boardThreshold.clone(), originalBoardImage, displayUtil);
 			if (displayUtil != null) {
-				displayUtil.showResult(projection);
+				displayUtil.showResult(projection.clone(), "projection");
 			}
 	
 			// Find red tokens in the image
@@ -83,7 +143,7 @@ public class ConnectFourVision {
 			// Create and display debug image for how the computer sees the game board
 			Mat computerView = buildComputerVisionImage(projection, redTokens, yellowTokens);
 			if (displayUtil != null) {
-				displayUtil.showResult(computerView);
+				displayUtil.showResult(computerView.clone(), "computer view");
 			}
 	
 			// Verify the number of tokens
@@ -109,7 +169,6 @@ public class ConnectFourVision {
 				System.out.println("It is Yellow's turn.");
 			}
 	
-
 
 			stopWatch.stop();
 
@@ -148,23 +207,19 @@ public class ConnectFourVision {
 
 		switch (color) {
 			case BLUE:
-				lower = new Scalar(0, 160, 60);
-				upper = new Scalar(15, 255, 255);
-				break;
-			case MYBLUE:
-				lower = new Scalar(100, 20, 60);
-				upper = new Scalar(135, 255, 255);
+				lower = lowerBlue;
+				upper = upperBlue;
 				break;
 			case RED:
-				lower = new Scalar(120, 160, 60);
-				upper = new Scalar(130, 255, 255);
+				lower = lowerRed;
+				upper = upperRed;
 
 			//	lower = new Scalar(110, 160, 60);
 		//		upper = new Scalar(130, 255, 255);
 				break;
 			case YELLOW:
-				lower = new Scalar(90, 160, 60);
-				upper = new Scalar(100, 255, 255);
+				lower = lowerYellow;
+				upper = upperYellow;
 				break;
 
 			default:
@@ -312,8 +367,11 @@ public class ConnectFourVision {
 		Imgproc.HoughLines(newImage, lines, 1, Math.PI / 180, 75);
 
 
-		ui.showResult(newImage);
-		ui.showResult(boardThreshold);
+		if(ui != null){
+			ui.showResult(newImage.clone(), "countoured");
+			//ui.showResult(boardThreshold);
+		}
+
 
 		LinkedList<Line> detectedLines = new LinkedList<Line>();
 		System.out.println("Total cols: " + lines.rows());
@@ -327,7 +385,7 @@ public class ConnectFourVision {
 				+ " lines that were detected.");
 		if (ui != null) {
 			Mat houghLinesImage = buildHoughLinesImage(originalBoardImage, contours, maxContourIndex, detectedLines);
-			ui.showResult(houghLinesImage);
+			ui.showResult(houghLinesImage.clone(), "houghLinesImage");
 		}
 
 		// Get the corners of the polygon and apply the transform

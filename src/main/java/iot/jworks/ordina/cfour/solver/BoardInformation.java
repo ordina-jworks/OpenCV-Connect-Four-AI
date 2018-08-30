@@ -14,6 +14,10 @@ public class BoardInformation {
 
     private long computerVisionCalculationDuration;
 
+    private int redTokens;
+
+    private int yellowTokens;
+
 
     public BoardInformation() {
     }
@@ -71,6 +75,8 @@ public class BoardInformation {
         this.projection = projection;
     }
 
+
+    
 
     @Override
     public String toString() {
