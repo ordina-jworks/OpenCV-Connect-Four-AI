@@ -149,7 +149,7 @@ public class ConnectFourVision {
 			// Verify the number of tokens
 			int tokenDifference = redTokens.size() - yellowTokens.size();
 			if (Math.abs(tokenDifference) > 1) {
-				throw new VisionException("Invalid numbers of game pieces.");
+				throw new VisionException("Invalid numbers of game pieces. Red: " + redTokens.size() + " yellow " + yellowTokens.size());
 			}
 	
 			// Calculate the supposed positions of the pieces

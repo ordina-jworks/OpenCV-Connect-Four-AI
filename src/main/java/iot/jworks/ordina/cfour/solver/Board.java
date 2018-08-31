@@ -61,6 +61,15 @@ public class Board {
         return grid;
     }
 
+    public int getRedTokens(){
+       return getTokenCount(Board.MARK_BLACK);
+    }
+
+    public int getYellowTokens(){
+        return getTokenCount(Board.MARK_BLACK);
+    }
+
+
     public void display() {
         for (int row = 0; row < ROWS; row++) {
             for (int col = 0; col < COLUMNS; col++) {

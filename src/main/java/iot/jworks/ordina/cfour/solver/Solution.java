@@ -9,6 +9,8 @@ public class Solution {
     private BoardInformation boardInformation;
     private long aiSolverDuration;
 
+    private Mat drawSolved;
+
     public Solution(int bestMove, BoardInformation boardInformation) {
         this.bestMove = bestMove;
         this.boardInformation = boardInformation;
@@ -18,6 +20,14 @@ public class Solution {
         this.boardInformation = boardInformation;
     }
 
+
+    public boolean hasVisionError(){
+        return boardInformation.getComputerVisionError() != null;
+    }
+
+    public String getSolvedInformation(){
+        return getCurrentPlayer() + " best move: " + getBestMove() + "| R:" + getBoardInformation().getBoard().getRedTokens() + " Y:"  + getBoardInformation().getBoard().getYellowTokens() +"| vision: " + getBoardInformation().getComputerVisionCalculationDuration() + " ai: " + getAiSolverDuration();
+    }
 
     public int getBestMove() {
         return bestMove;
@@ -44,6 +54,14 @@ public class Solution {
         this.aiSolverDuration = aiSolverDuration;
     }
 
+    public Mat getDrawSolved() {
+        return drawSolved;
+    }
+
+    public void setDrawSolved(Mat drawSolved) {
+        this.drawSolved = drawSolved;
+    }
+
     @Override
     public String toString() {
         return "Solution{" +
@@ -61,4 +79,5 @@ public class Solution {
 
         return player;
     }
+
 }
